@@ -1,6 +1,9 @@
-def main():
-    print("Hello from 01-course-platform!")
+from fastapi import FastAPI
 
 
-if __name__ == "__main__":
-    main()
+app = FastAPI()
+
+
+@app.get("/health")
+def _health_check():
+    return "Running"

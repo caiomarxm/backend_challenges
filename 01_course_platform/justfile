@@ -1,0 +1,5 @@
+run-dev:
+    uv run uvicorn main:app --port 5000 --reload
+
+run:
+    uv run uvicorn main:app --port 5000
