@@ -1,5 +1,12 @@
+default:
+  just --list
+
 run-dev:
     uv run uvicorn src.main:app --port 5000 --reload
 
 run:
     uv run uvicorn src.main:app --port 5000
+
+
+migrate-new migration_description:
+    uv run alembic revision -m {migration_description}
