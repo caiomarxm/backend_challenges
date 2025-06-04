@@ -8,5 +8,9 @@ run:
     uv run uvicorn src.main:app --port 5000
 
 
+create-db:
+    PYTHONPATH=$PWD python scripts/create_db.py
+
+
 migrate-new migration_description:
     uv run alembic revision -m {migration_description}
