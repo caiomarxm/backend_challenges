@@ -6,5 +6,7 @@ class Settings(BaseSettings):
 
     SQLITE_PATH: str = "./data/app_database.db"
 
+    DATABASE_CONNECTION_STRING: str = "sqlite:///data/app_database.db"
+
 
 settings = Settings()
