@@ -10,5 +10,7 @@ class Settings(BaseSettings):
 
     DATABASE_CONNECTION_STRING: str = "sqlite:///data/app_database.db"
 
+    PAGINATION_PAGE_MAX_LIMIT: int = 20
+
 
 settings = Settings()

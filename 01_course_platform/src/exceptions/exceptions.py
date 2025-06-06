@@ -4,6 +4,8 @@ from pydantic import BaseModel
 
 
 class ErrorCode(str, Enum):
+    BAD_REQUEST = "bad_request"
+
     USER_ALREADY_EXISTS = "user_already_exists"
     USER_EMAIL_INVALID = "user_email_invalid"
 
@@ -15,6 +17,12 @@ class ErrorDetail(BaseModel):
 
     # TODO: Don't propagate this to the frontend
     debug_message: str | None = None
+
+
+class BadRequestErrorDetail(ErrorDetail):
+    error_code: ErrorCode = ErrorCode.BAD_REQUEST
+    http_status_code: int = 400
+    error_message: str
 
 
 class UserAlreadyExistsErrorDetail(ErrorDetail):

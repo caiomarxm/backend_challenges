@@ -47,3 +47,10 @@ def _create_user(request: CreateUserRequest):
     user = UserService.create_user(user_create=request)
 
     return user
+
+
+@app.get("/users")
+def _list_users(page: int = 1, per_page: int = 10):
+    users = UserService.list_users(page=page, per_page=per_page)
+
+    return users

@@ -20,3 +20,10 @@ def create_user(user_create: User, db_session: Session) -> User:
     db_session.refresh(db_user)
 
     return db_user
+
+
+def list_users(db_session: Session, offset: int = 1, limit: int = 10) -> list[User]:
+    statement = select(User).offset(offset).limit(limit)
+    users = list(db_session.exec(statement).all())
+
+    return users
