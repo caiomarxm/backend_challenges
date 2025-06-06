@@ -1,0 +1,29 @@
+from enum import Enum
+
+from pydantic import BaseModel
+
+
+class ErrorCode(str, Enum):
+    USER_ALREADY_EXISTS = "user_already_exists"
+
+
+class ErrorDetail(BaseModel):
+    error_code: ErrorCode
+    http_status_code: int
+    error_message: str
+
+    # TODO: Don't propagate this to the frontend
+    debug_message: str | None = None
+
+
+class UserAlreadyExistsErrorDetail(ErrorDetail):
+    error_code: ErrorCode = ErrorCode.USER_ALREADY_EXISTS
+    http_status_code: int = 400
+    error_message: str = "A user with this email already exists in the platform"
+
+
+class AppError(Exception):
+    detail: ErrorDetail
+
+    def __init__(self, error_details: ErrorDetail):
+        self.detail = error_details
