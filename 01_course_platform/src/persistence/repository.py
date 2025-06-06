@@ -1,4 +1,4 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, col, or_, select
 
 from src.exceptions.exceptions import AppError, UserAlreadyExistsErrorDetail
 from src.persistence.models import User
@@ -22,8 +22,27 @@ def create_user(user_create: User, db_session: Session) -> User:
     return db_user
 
 
-def list_users(db_session: Session, offset: int = 1, limit: int = 10) -> list[User]:
+def list_users(
+    db_session: Session,
+    offset: int = 1,
+    limit: int = 10,
+    name: str | None = None,
+    email: str | None = None,
+) -> list[User]:
+    filters = []
+
+    if name:
+        filters.append(col(User.full_name).contains(name))
+
+    if email:
+        filters.append(col(User.email).contains(email))
+
     statement = select(User).offset(offset).limit(limit)
+
+    if filters:
+        statement = statement.where(or_(*filters))
+        print(statement.__repr__)
+
     users = list(db_session.exec(statement).all())
 
     return users

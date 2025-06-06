@@ -3,6 +3,7 @@ from src.exceptions.exceptions import (
     BadRequestErrorDetail,
     UserEmailInvalidErrorDetails,
 )
+from src.http.dtos import UserFilters
 from src.persistence import repository
 from src.persistence.database import database_session
 from src.persistence.models import User, UserBase
@@ -23,27 +24,31 @@ class UserService:
         return db_user
 
     @staticmethod
-    def list_users(page: int, per_page: int) -> list[User]:
-        if page < 1:
+    def list_users(filters: UserFilters) -> list[User]:
+        if filters.page < 1:
             raise AppError(
                 error_details=BadRequestErrorDetail(
                     error_message="Page must be equal or greater than 1"
                 )
             )
 
-        if per_page < 1:
+        if filters.per_page < 1:
             raise AppError(
                 error_details=BadRequestErrorDetail(
                     error_message="Per page must be equal or greater than 1"
                 )
             )
 
-        offset = per_page * (page - 1)
-        limit = per_page
+        offset = filters.per_page * (filters.page - 1)
+        limit = filters.per_page
 
         with database_session() as session:
             users = repository.list_users(
-                db_session=session, offset=offset, limit=limit
+                db_session=session,
+                offset=offset,
+                limit=limit,
+                name=filters.name,
+                email=filters.email,
             )
 
         return users

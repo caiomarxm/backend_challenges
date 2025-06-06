@@ -1,12 +1,13 @@
 import traceback
+from typing import Annotated
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import JSONResponse
 
 from src.config.settings import settings
 from src.core.service import UserService
 from src.exceptions.exceptions import AppError
-from src.http.dtos import CreateUserRequest
+from src.http.dtos import CreateUserRequest, UserFilters
 
 app = FastAPI()
 
@@ -50,7 +51,7 @@ def _create_user(request: CreateUserRequest):
 
 
 @app.get("/users")
-def _list_users(page: int = 1, per_page: int = 10):
-    users = UserService.list_users(page=page, per_page=per_page)
+def _list_users(filters: Annotated[UserFilters, Query()]):
+    users = UserService.list_users(filters=filters)
 
     return users
