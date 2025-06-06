@@ -12,3 +12,18 @@ dependencies = [
     "sqlmodel>=0.0.24",
     "uvicorn>=0.34.3",
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"  # Change this to your Python version
+select = ["E", "F", "I"]   # Style, Lint, and Import sorting rules
+ignore = []
+fixable = ["I"]            # Only allow auto-fix for import sorting
+unfixable = ["F401"]       # Don't auto-remove unused imports
+
+[tool.ruff.isort]
+force-sort-within-sections = true
+lines-between-types = 1
+combine-as-imports = true
+known-first-party = ["your_project"]  # Replace with your package/module name
+
