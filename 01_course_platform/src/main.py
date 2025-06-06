@@ -19,7 +19,7 @@ async def _render_error_if_request_fails(request: Request, call_next):
     except AppError as error:
         print(f"Failed to process user request: {error}")
 
-        error_content = error.detail.model_dump()
+        error_content = error.detail.model_dump(exclude={"http_status_code"})
         if not settings.DEBUG:
             error_content.pop("debug_message")
 
