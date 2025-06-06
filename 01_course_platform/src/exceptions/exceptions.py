@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class ErrorCode(str, Enum):
     USER_ALREADY_EXISTS = "user_already_exists"
+    USER_EMAIL_INVALID = "user_email_invalid"
 
 
 class ErrorDetail(BaseModel):
@@ -20,6 +21,12 @@ class UserAlreadyExistsErrorDetail(ErrorDetail):
     error_code: ErrorCode = ErrorCode.USER_ALREADY_EXISTS
     http_status_code: int = 400
     error_message: str = "A user with this email already exists in the platform"
+
+
+class UserEmailInvalidErrorDetails(ErrorDetail):
+    error_code: ErrorCode = ErrorCode.USER_EMAIL_INVALID
+    http_status_code: int = 400
+    error_message: str = "The provided email is invalid"
 
 
 class AppError(Exception):

@@ -4,7 +4,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from src.config.settings import settings
+from src.core.service import UserService
 from src.exceptions.exceptions import AppError
+from src.http.dtos import CreateUserRequest
 
 app = FastAPI()
 
@@ -38,3 +40,10 @@ async def _render_error_if_request_fails(request: Request, call_next):
 @app.get("/health")
 def _health_check():
     return "Running"
+
+
+@app.post("/users")
+def _create_user(request: CreateUserRequest):
+    user = UserService.create_user(user_create=request)
+
+    return user
