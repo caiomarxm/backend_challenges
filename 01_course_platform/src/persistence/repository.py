@@ -76,3 +76,17 @@ def update_user(db_session: Session, user_id: int, user_update: User) -> User:
     db_session.refresh(db_user)
 
     return db_user
+
+
+def delete_user(db_session: Session, user_id: int):
+    db_user = db_session.get(User, user_id)
+
+    if not db_user:
+        raise AppError(
+            error_details=BadRequestErrorDetail(
+                http_status_code=404, error_message="User does not exist"
+            )
+        )
+
+    db_session.delete(db_user)
+    db_session.commit()

@@ -85,3 +85,8 @@ class UserService:
             )
 
         return db_user
+
+    @staticmethod
+    def delete_user(user_id: int) -> None:
+        with database_session() as session:
+            repository.delete_user(db_session=session, user_id=user_id)

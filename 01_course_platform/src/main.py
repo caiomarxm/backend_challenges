@@ -67,3 +67,8 @@ def _update_user(user_id: int, user: UpdateUserRequest):
 @app.get("/users/{user_id}")
 def _get_user(user_id: int):
     return UserService.get_user(user_id)
+
+
+@app.delete("/users/{user_id}", status_code=204)
+def _delete_user(user_id: int):
+    UserService.delete_user(user_id=user_id)
