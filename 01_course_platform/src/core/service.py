@@ -71,3 +71,17 @@ class UserService:
             )
 
         return db_user
+
+    @staticmethod
+    def get_user(user_id: int) -> User:
+        with database_session() as session:
+            db_user = repository.read_user(db_session=session, user_id=user_id)
+
+        if not db_user:
+            raise AppError(
+                BadRequestErrorDetail(
+                    http_status_code=404, error_message="User does not exist"
+                )
+            )
+
+        return db_user

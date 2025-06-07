@@ -62,3 +62,8 @@ def _update_user(user_id: int, user: UpdateUserRequest):
     updated_user = UserService.update_user(user_id, user)
 
     return updated_user
+
+
+@app.get("/users/{user_id}")
+def _get_user(user_id: int):
+    return UserService.get_user(user_id)
