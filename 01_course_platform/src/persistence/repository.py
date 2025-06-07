@@ -1,6 +1,10 @@
 from sqlmodel import Session, col, or_, select
 
-from src.exceptions.exceptions import AppError, UserAlreadyExistsErrorDetail
+from src.exceptions.exceptions import (
+    AppError,
+    BadRequestErrorDetail,
+    UserAlreadyExistsErrorDetail,
+)
 from src.persistence.models import User
 
 
@@ -46,3 +50,29 @@ def list_users(
     users = list(db_session.exec(statement).all())
 
     return users
+
+
+def read_user(db_session: Session, user_id: int) -> User | None:
+    db_user = db_session.get(User, user_id)
+
+    return db_user
+
+
+def update_user(db_session: Session, user_id: int, user_update: User) -> User:
+    db_user = read_user(db_session, user_id)
+
+    if not db_user:
+        raise AppError(
+            error_details=BadRequestErrorDetail(error_message="User does not exist")
+        )
+
+    # Update the existing user's attributes
+    update_data = user_update.model_dump(exclude_none=True, exclude={"id"})
+    for key, value in update_data.items():
+        setattr(db_user, key, value)
+
+    db_session.add(db_user)
+    db_session.commit()
+    db_session.refresh(db_user)
+
+    return db_user

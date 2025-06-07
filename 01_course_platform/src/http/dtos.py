@@ -14,3 +14,8 @@ class UserFilters(BaseModel):
 
     page: int = 0
     per_page: int = 10
+
+
+class UpdateUserRequest(BaseModel):
+    email: str | None = None
+    full_name: str | None = None

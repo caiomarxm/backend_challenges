@@ -3,7 +3,7 @@ from src.exceptions.exceptions import (
     BadRequestErrorDetail,
     UserEmailInvalidErrorDetails,
 )
-from src.http.dtos import UserFilters
+from src.http.dtos import UpdateUserRequest, UserFilters
 from src.persistence import repository
 from src.persistence.database import database_session
 from src.persistence.models import User, UserBase
@@ -52,3 +52,22 @@ class UserService:
             )
 
         return users
+
+    @staticmethod
+    def update_user(user_id: int, user_update_request: UpdateUserRequest) -> User:
+        db_user = None
+        with database_session() as session:
+            db_user = repository.read_user(session, user_id)
+
+            if not db_user:
+                # TODO: Raise specific error here
+                raise
+
+            updated_user = db_user.model_copy(
+                update=user_update_request.model_dump(exclude_none=True)
+            )
+            db_user = repository.update_user(
+                db_session=session, user_id=user_id, user_update=updated_user
+            )
+
+        return db_user
