@@ -16,5 +16,9 @@ migrate-new migration_description:
     uv run alembic revision -m {migration_description}
 
 
+migrate-new-autogenerate migration_description:
+    uv run alembic revision -m {migration_description} --autogenerate
+
+
 migrate-up:
     PYTHONPATH=$PWD uv run alembic upgrade head
