@@ -1,6 +1,8 @@
+from typing import Annotated
+
 from pydantic import BaseModel
 
-from src.persistence.models import UserBase
+from src.persistence.models import Course, UserBase
 
 
 # FIXME: Think if we actually need this
@@ -21,12 +23,19 @@ class UpdateUserRequest(BaseModel):
     full_name: str | None = None
 
 
+# FIXME: Remove dead code
 class CourseResponse(BaseModel):
     id: int | None = None
     name: str
     description: str
 
 
+class CourseCreate(BaseModel):
+    name: Annotated[str, "The name of the course"]
+    description: Annotated[str, "A brief description of the course"]
+    instructor_id: Annotated[int, "The user.id of the instructor of this course"]
+
+
 class UserWithCoursesInstructed(UserBase):
     id: int | None = None
-    courses_instructed: list[CourseResponse] = []
+    courses_instructed: list[Course] = []

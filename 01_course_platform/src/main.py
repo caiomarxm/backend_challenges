@@ -5,9 +5,10 @@ from fastapi import FastAPI, Query, Request
 from fastapi.responses import JSONResponse
 
 from src.config.settings import settings
-from src.core.service import UserService
+from src.core.service import CourseService, UserService
 from src.exceptions.exceptions import AppError
 from src.http.dtos import (
+    CourseCreate,
     CreateUserRequest,
     UpdateUserRequest,
     UserFilters,
@@ -76,3 +77,15 @@ def _get_user(user_id: int, include: str | None = None):
 @app.delete("/users/{user_id}", status_code=204)
 def _delete_user(user_id: int):
     UserService.delete_user(user_id=user_id)
+
+
+#
+# Courses
+#
+
+
+@app.post("/courses")
+def _create_course(course_create: CourseCreate):
+    course = CourseService.create_course(course_create=course_create)
+
+    return course

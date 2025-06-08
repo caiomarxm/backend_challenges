@@ -1,11 +1,11 @@
-from sqlmodel import Session, col, or_, select
+from sqlmodel import Session, and_, col, or_, select
 
 from src.exceptions.exceptions import (
     AppError,
     BadRequestErrorDetail,
     UserAlreadyExistsErrorDetail,
 )
-from src.persistence.models import User
+from src.persistence.models import Course, User
 
 
 def create_user(user_create: User, db_session: Session) -> User:
@@ -90,3 +90,34 @@ def delete_user(db_session: Session, user_id: int):
 
     db_session.delete(db_user)
     db_session.commit()
+
+
+#
+# Course
+#
+
+
+def create_course(db_session: Session, course_create: Course) -> Course:
+    select_course_statement = select(Course).where(
+        and_(
+            Course.name == course_create.name,
+            Course.instructor_id == course_create.instructor_id,
+        )
+    )
+    db_course = db_session.exec(select_course_statement).first()
+
+    if db_course:
+        raise AppError(
+            error_details=BadRequestErrorDetail(
+                error_message=f"Course {course_create.name} already exists with instructor {db_course.instructor.full_name}"
+            )
+        )
+
+    db_course = Course(**course_create.model_dump())
+    db_session.add(db_course)
+    db_session.commit()
+
+    # Refresh db_course to get id value
+    db_session.refresh(db_course)
+
+    return db_course

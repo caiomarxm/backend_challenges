@@ -4,13 +4,14 @@ from src.exceptions.exceptions import (
     UserEmailInvalidErrorDetails,
 )
 from src.http.dtos import (
+    CourseCreate,
     UpdateUserRequest,
     UserFilters,
     UserWithCoursesInstructed,
 )
 from src.persistence import repository
 from src.persistence.database import database_session
-from src.persistence.models import User, UserBase
+from src.persistence.models import Course, User, UserBase
 from src.utils.validation import is_email_valid
 
 
@@ -91,7 +92,7 @@ class UserService:
                 )
 
             if include and "courses_instructed" in include:
-                return UserWithCoursesInstructed(**db_user.model_dump())
+                return UserWithCoursesInstructed.model_validate(db_user)
 
         return db_user
 
@@ -99,3 +100,16 @@ class UserService:
     def delete_user(user_id: int) -> None:
         with database_session() as session:
             repository.delete_user(db_session=session, user_id=user_id)
+
+
+class CourseService:
+    @staticmethod
+    def create_course(course_create: CourseCreate) -> Course:
+        db_course = Course(**course_create.model_dump())
+
+        with database_session() as session:
+            db_course = repository.create_course(
+                db_session=session, course_create=db_course
+            )
+
+        return db_course
