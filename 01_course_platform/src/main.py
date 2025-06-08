@@ -1,8 +1,9 @@
 import traceback
 from typing import Annotated
 
-from fastapi import FastAPI, Query, Request
+from fastapi import Depends, FastAPI, Query, Request
 from fastapi.responses import JSONResponse
+from sqlmodel import Session
 
 from src.config.settings import settings
 from src.core.service import CourseService, EnrollmentService, UserService
@@ -15,7 +16,12 @@ from src.http.dtos import (
     EnrollmentCreate,
     UpdateUserRequest,
     UserFilters,
+    UserFull,
+    UserWithCoursesEnrolled,
+    UserWithCoursesInstructed,
 )
+from src.persistence.database import get_database_session
+from src.persistence.models import User
 
 app = FastAPI()
 
@@ -59,7 +65,9 @@ def _create_user(request: CreateUserRequest):
 
 
 @app.get("/users")
-def _list_users(filters: Annotated[UserFilters, Query()]):
+def _list_users(
+    filters: Annotated[UserFilters, Query()],
+):
     users = UserService.list_users(filters=filters)
 
     return users
@@ -72,9 +80,33 @@ def _update_user(user_id: int, user: UpdateUserRequest):
     return updated_user
 
 
-@app.get("/users/{user_id}")
-def _get_user(user_id: int, include: str | None = None):
-    return UserService.get_user(user_id, include=include)
+@app.get(
+    "/users/{user_id}",
+    response_model=User
+    | UserWithCoursesInstructed
+    | UserWithCoursesEnrolled
+    | UserFull,
+)
+def _get_user(
+    user_id: int,
+    include: str | None = None,
+    db_session: Session = Depends(get_database_session),
+):
+    user = UserService.get_user(user_id, include=include, db_session=db_session)
+
+    include_courses_instructed = include and "instructed" in include
+    include_courses_enrolled = include and "enrolled" in include
+
+    if include_courses_instructed and not include_courses_enrolled:
+        return UserWithCoursesInstructed.model_validate(user)
+
+    if not include_courses_instructed and include_courses_enrolled:
+        return UserWithCoursesEnrolled.model_validate(user)
+
+    if include_courses_instructed and include_courses_enrolled:
+        return UserFull.model_validate(user)
+
+    return user
 
 
 @app.delete("/users/{user_id}", status_code=204)

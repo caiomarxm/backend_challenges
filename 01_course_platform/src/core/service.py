@@ -14,7 +14,7 @@ from src.http.dtos import (
     UserWithCoursesInstructed,
 )
 from src.persistence import repository
-from src.persistence.database import database_session
+from src.persistence.database import Session, database_session
 from src.persistence.models import Course, Enrollment, User, UserBase
 from src.utils.validation import is_email_valid
 
@@ -83,20 +83,15 @@ class UserService:
 
     @staticmethod
     def get_user(
-        user_id: int, include: str | None = None
+        user_id: int, db_session: Session, include: str | None = None
     ) -> User | UserWithCoursesInstructed:
-        with database_session() as session:
-            db_user = repository.read_user(db_session=session, user_id=user_id)
-
-            if not db_user:
-                raise AppError(
-                    BadRequestErrorDetail(
-                        http_status_code=404, error_message="User does not exist"
-                    )
+        db_user = repository.read_user(db_session=db_session, user_id=user_id)
+        if not db_user:
+            raise AppError(
+                BadRequestErrorDetail(
+                    http_status_code=404, error_message="User does not exist"
                 )
-
-            if include and "courses_instructed" in include:
-                return UserWithCoursesInstructed.model_validate(db_user)
+            )
 
         return db_user
 

@@ -57,6 +57,17 @@ class UserWithCoursesInstructed(UserBase):
     courses_instructed: list[Course] = []
 
 
+class UserWithCoursesEnrolled(UserBase):
+    id: int | None = None
+    courses_enrolled: list[Course] = []
+
+
+class UserFull(UserBase):
+    id: int | None = None
+    courses_instructed: list[Course] = []
+    courses_enrolled: list[Course] = []
+
+
 class CourseFilters(BaseModel):
     name: str | None = None
     description: str | None = None
