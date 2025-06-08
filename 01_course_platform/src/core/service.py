@@ -3,7 +3,11 @@ from src.exceptions.exceptions import (
     BadRequestErrorDetail,
     UserEmailInvalidErrorDetails,
 )
-from src.http.dtos import UpdateUserRequest, UserFilters
+from src.http.dtos import (
+    UpdateUserRequest,
+    UserFilters,
+    UserWithCoursesInstructed,
+)
 from src.persistence import repository
 from src.persistence.database import database_session
 from src.persistence.models import User, UserBase
@@ -73,16 +77,21 @@ class UserService:
         return db_user
 
     @staticmethod
-    def get_user(user_id: int) -> User:
+    def get_user(
+        user_id: int, include: str | None = None
+    ) -> User | UserWithCoursesInstructed:
         with database_session() as session:
             db_user = repository.read_user(db_session=session, user_id=user_id)
 
-        if not db_user:
-            raise AppError(
-                BadRequestErrorDetail(
-                    http_status_code=404, error_message="User does not exist"
+            if not db_user:
+                raise AppError(
+                    BadRequestErrorDetail(
+                        http_status_code=404, error_message="User does not exist"
+                    )
                 )
-            )
+
+            if include and "courses_instructed" in include:
+                return UserWithCoursesInstructed(**db_user.model_dump())
 
         return db_user
 

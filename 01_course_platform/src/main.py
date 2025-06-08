@@ -7,7 +7,11 @@ from fastapi.responses import JSONResponse
 from src.config.settings import settings
 from src.core.service import UserService
 from src.exceptions.exceptions import AppError
-from src.http.dtos import CreateUserRequest, UpdateUserRequest, UserFilters
+from src.http.dtos import (
+    CreateUserRequest,
+    UpdateUserRequest,
+    UserFilters,
+)
 
 app = FastAPI()
 
@@ -65,8 +69,8 @@ def _update_user(user_id: int, user: UpdateUserRequest):
 
 
 @app.get("/users/{user_id}")
-def _get_user(user_id: int):
-    return UserService.get_user(user_id)
+def _get_user(user_id: int, include: str | None = None):
+    return UserService.get_user(user_id, include=include)
 
 
 @app.delete("/users/{user_id}", status_code=204)

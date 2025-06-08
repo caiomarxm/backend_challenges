@@ -19,3 +19,14 @@ class UserFilters(BaseModel):
 class UpdateUserRequest(BaseModel):
     email: str | None = None
     full_name: str | None = None
+
+
+class CourseResponse(BaseModel):
+    id: int | None = None
+    name: str
+    description: str
+
+
+class UserWithCoursesInstructed(UserBase):
+    id: int | None = None
+    courses_instructed: list[CourseResponse] = []
