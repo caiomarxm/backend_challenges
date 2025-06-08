@@ -7,6 +7,7 @@ from src.http.dtos import (
     CourseCreate,
     CourseFilters,
     CourseUpdateRequest,
+    CourseWithInstructor,
     UpdateUserRequest,
     UserFilters,
     UserWithCoursesInstructed,
@@ -129,7 +130,9 @@ class CourseService:
         return db_course
 
     @staticmethod
-    def list_courses(filters: CourseFilters) -> list[Course]:
+    def list_courses(
+        filters: CourseFilters,
+    ) -> list[Course] | list[CourseWithInstructor]:
         if filters.page < 1:
             raise AppError(
                 error_details=BadRequestErrorDetail(
@@ -156,5 +159,15 @@ class CourseService:
                 description=filters.description,
                 instructor_name=filters.instructor_name,
             )
+
+            if filters.include_instructors:
+                courses = [
+                    CourseWithInstructor(
+                        # TODO: As we scale up, we need to make this more performant
+                        **course.model_dump(),
+                        instructor=course.instructor,
+                    )
+                    for course in courses
+                ]
 
         return courses

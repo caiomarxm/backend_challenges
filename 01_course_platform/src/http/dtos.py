@@ -2,7 +2,7 @@ from typing import Annotated
 
 from pydantic import BaseModel
 
-from src.persistence.models import Course, UserBase
+from src.persistence.models import Course, User, UserBase
 
 
 # FIXME: Think if we actually need this
@@ -30,10 +30,19 @@ class CourseResponse(BaseModel):
     description: str
 
 
-class CourseCreate(BaseModel):
+class CourseBase(BaseModel):
     name: Annotated[str, "The name of the course"]
     description: Annotated[str, "A brief description of the course"]
     instructor_id: Annotated[int, "The user.id of the instructor of this course"]
+
+
+class CourseCreate(BaseModel):
+    pass
+
+
+class CourseWithInstructor(CourseBase):
+    id: int
+    instructor: User
 
 
 class CourseUpdateRequest(BaseModel):
@@ -51,6 +60,8 @@ class CourseFilters(BaseModel):
     name: str | None = None
     description: str | None = None
     instructor_name: str | None = None
+
+    include_instructors: bool = False
 
     page: int = 1
     per_page: int = 10
