@@ -5,13 +5,14 @@ from fastapi import FastAPI, Query, Request
 from fastapi.responses import JSONResponse
 
 from src.config.settings import settings
-from src.core.service import CourseService, UserService
+from src.core.service import CourseService, EnrollmentService, UserService
 from src.exceptions.exceptions import AppError
 from src.http.dtos import (
     CourseCreate,
     CourseFilters,
     CourseUpdateRequest,
     CreateUserRequest,
+    EnrollmentCreate,
     UpdateUserRequest,
     UserFilters,
 )
@@ -105,3 +106,12 @@ def _list_courses(filters: Annotated[CourseFilters, Query()]):
     courses = CourseService.list_courses(filters=filters)
 
     return courses
+
+
+@app.post("/enrollments")
+def _create_enrollment(enrollment_create: EnrollmentCreate):
+    enrollment = EnrollmentService.create_enrollment(
+        enrollment_create=enrollment_create
+    )
+
+    return enrollment

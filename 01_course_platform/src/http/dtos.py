@@ -1,8 +1,9 @@
+from datetime import datetime
 from typing import Annotated
 
 from pydantic import BaseModel
 
-from src.persistence.models import Course, User, UserBase
+from src.persistence.models import Course, EnrollmentStatus, User, UserBase
 
 
 # FIXME: Think if we actually need this
@@ -65,3 +66,11 @@ class CourseFilters(BaseModel):
 
     page: int = 1
     per_page: int = 10
+
+
+class EnrollmentCreate(BaseModel):
+    user_id: int
+    course_id: int
+
+    start_date: datetime = datetime.now()
+    status: EnrollmentStatus = EnrollmentStatus.ACTIVE

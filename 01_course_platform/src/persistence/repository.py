@@ -5,7 +5,7 @@ from src.exceptions.exceptions import (
     BadRequestErrorDetail,
     UserAlreadyExistsErrorDetail,
 )
-from src.persistence.models import Course, User
+from src.persistence.models import Course, Enrollment, User
 
 
 def create_user(user_create: User, db_session: Session) -> User:
@@ -186,3 +186,28 @@ def list_courses(
     courses = list(db_session.exec(statement).all())
 
     return courses
+
+
+def create_enrollment(db_session: Session, enrollment_create: Enrollment) -> Enrollment:
+    user_id = enrollment_create.user_id
+    course_id = enrollment_create.course_id
+
+    select_enrollment_statement = select(Enrollment).where(
+        and_(Enrollment.user_id == user_id, Enrollment.course_id == course_id)
+    )
+
+    db_enrollment = db_session.exec(select_enrollment_statement).first()
+    if db_enrollment:
+        raise AppError(
+            error_details=BadRequestErrorDetail(
+                error_message="User is already enrolled in this course"
+            )
+        )
+
+    db_enrollment = Enrollment(**enrollment_create.model_dump())
+
+    db_session.add(db_enrollment)
+    db_session.commit()
+    db_session.refresh(db_enrollment)
+
+    return db_enrollment

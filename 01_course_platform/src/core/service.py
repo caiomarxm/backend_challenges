@@ -8,13 +8,14 @@ from src.http.dtos import (
     CourseFilters,
     CourseUpdateRequest,
     CourseWithInstructor,
+    EnrollmentCreate,
     UpdateUserRequest,
     UserFilters,
     UserWithCoursesInstructed,
 )
 from src.persistence import repository
 from src.persistence.database import database_session
-from src.persistence.models import Course, User, UserBase
+from src.persistence.models import Course, Enrollment, User, UserBase
 from src.utils.validation import is_email_valid
 
 
@@ -171,3 +172,38 @@ class CourseService:
                 ]
 
         return courses
+
+    @staticmethod
+    def get_course(course_id: int) -> Course:
+        with database_session() as session:
+            db_course = repository.read_course(db_session=session, course_id=course_id)
+
+            if not db_course:
+                raise AppError(
+                    BadRequestErrorDetail(
+                        http_status_code=404, error_message="Course does not exist"
+                    )
+                )
+
+        return db_course
+
+
+class EnrollmentService:
+    @staticmethod
+    def create_enrollment(enrollment_create: EnrollmentCreate) -> Enrollment:
+        course = CourseService.get_course(course_id=enrollment_create.course_id)
+
+        if enrollment_create.user_id == course.instructor_id:
+            raise AppError(
+                error_details=BadRequestErrorDetail(
+                    error_message="Cannot enroll an instructor to its own course."
+                )
+            )
+
+        db_enrollment = Enrollment(**enrollment_create.model_dump(exclude_none=True))
+        with database_session() as session:
+            db_enrollment = repository.create_enrollment(
+                db_session=session, enrollment_create=db_enrollment
+            )
+
+        return db_enrollment
