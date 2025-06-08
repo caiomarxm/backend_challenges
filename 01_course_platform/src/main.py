@@ -9,6 +9,7 @@ from src.core.service import CourseService, UserService
 from src.exceptions.exceptions import AppError
 from src.http.dtos import (
     CourseCreate,
+    CourseFilters,
     CourseUpdateRequest,
     CreateUserRequest,
     UpdateUserRequest,
@@ -97,3 +98,10 @@ def _update_course(course_id: int, course_update: CourseUpdateRequest):
     updated_course = CourseService.update_course(course_id, course_update)
 
     return updated_course
+
+
+@app.get("/courses")
+def _list_courses(filters: Annotated[CourseFilters, Query()]):
+    courses = CourseService.list_courses(filters=filters)
+
+    return courses

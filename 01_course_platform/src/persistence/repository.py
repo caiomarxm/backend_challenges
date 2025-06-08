@@ -147,3 +147,42 @@ def update_course(db_session: Session, course_id: int, course_update: Course) ->
     db_session.refresh(db_course)
 
     return db_course
+
+
+def list_courses(
+    db_session: Session,
+    offset: int = 1,
+    limit: int = 10,
+    name: str | None = None,
+    description: str | None = None,
+    instructor_name: str | None = None,
+) -> list[Course]:
+    filters = []
+
+    if name:
+        filters.append(col(Course.name).contains(name))
+
+    if description:
+        filters.append(col(Course.description).contains(description))
+
+    if instructor_name:
+        select_possible_instructors_statement = select(User).where(
+            col(User.full_name).contains(instructor_name)
+        )
+        possible_instructors = db_session.exec(
+            select_possible_instructors_statement
+        ).all()
+        possible_instructors_ids = [
+            instructor.id for instructor in possible_instructors
+        ]
+        filters.append(col(Course.instructor_id).in_(possible_instructors_ids))
+
+    statement = select(Course).offset(offset).limit(limit)
+
+    if filters:
+        statement = statement.where(and_(*filters))
+        print(statement.__repr__)
+
+    courses = list(db_session.exec(statement).all())
+
+    return courses

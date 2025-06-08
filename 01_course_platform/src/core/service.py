@@ -5,6 +5,7 @@ from src.exceptions.exceptions import (
 )
 from src.http.dtos import (
     CourseCreate,
+    CourseFilters,
     CourseUpdateRequest,
     UpdateUserRequest,
     UserFilters,
@@ -126,3 +127,34 @@ class CourseService:
             )
 
         return db_course
+
+    @staticmethod
+    def list_courses(filters: CourseFilters) -> list[Course]:
+        if filters.page < 1:
+            raise AppError(
+                error_details=BadRequestErrorDetail(
+                    error_message="Page must be equal or greater than 1"
+                )
+            )
+
+        if filters.per_page < 1:
+            raise AppError(
+                error_details=BadRequestErrorDetail(
+                    error_message="Per page must be equal or greater than 1"
+                )
+            )
+
+        offset = filters.per_page * (filters.page - 1)
+        limit = filters.per_page
+
+        with database_session() as session:
+            courses = repository.list_courses(
+                db_session=session,
+                offset=offset,
+                limit=limit,
+                name=filters.name,
+                description=filters.description,
+                instructor_name=filters.instructor_name,
+            )
+
+        return courses

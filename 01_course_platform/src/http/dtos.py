@@ -14,7 +14,7 @@ class UserFilters(BaseModel):
     email: str | None = None
     name: str | None = None
 
-    page: int = 0
+    page: int = 1
     per_page: int = 10
 
 
@@ -44,3 +44,12 @@ class CourseUpdateRequest(BaseModel):
 class UserWithCoursesInstructed(UserBase):
     id: int | None = None
     courses_instructed: list[Course] = []
+
+
+class CourseFilters(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    instructor_name: str | None = None
+
+    page: int = 1
+    per_page: int = 10
