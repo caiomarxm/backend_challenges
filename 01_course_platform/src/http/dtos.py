@@ -39,6 +39,7 @@ class CourseCreate(BaseModel):
 class CourseUpdateRequest(BaseModel):
     name: str | None = None
     description: str | None = None
+    instructor_id: int | None = None
 
 
 class UserWithCoursesInstructed(UserBase):
