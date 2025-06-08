@@ -121,3 +121,29 @@ def create_course(db_session: Session, course_create: Course) -> Course:
     db_session.refresh(db_course)
 
     return db_course
+
+
+def read_course(db_session: Session, course_id: int) -> Course | None:
+    db_course = db_session.get(Course, course_id)
+
+    return db_course
+
+
+def update_course(db_session: Session, course_id: int, course_update: Course) -> Course:
+    db_course = read_course(db_session, course_id)
+
+    if not db_course:
+        raise AppError(
+            error_details=BadRequestErrorDetail(error_message="Course does not exist")
+        )
+
+    # Update the existing user's attributes
+    update_data = course_update.model_dump(exclude_none=True, exclude={"id"})
+    for key, value in update_data.items():
+        setattr(db_course, key, value)
+
+    db_session.add(db_course)
+    db_session.commit()
+    db_session.refresh(db_course)
+
+    return db_course

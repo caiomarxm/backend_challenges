@@ -5,6 +5,7 @@ from src.exceptions.exceptions import (
 )
 from src.http.dtos import (
     CourseCreate,
+    CourseUpdateRequest,
     UpdateUserRequest,
     UserFilters,
     UserWithCoursesInstructed,
@@ -110,6 +111,18 @@ class CourseService:
         with database_session() as session:
             db_course = repository.create_course(
                 db_session=session, course_create=db_course
+            )
+
+        return db_course
+
+    @staticmethod
+    def update_course(
+        course_id: int, course_update_request: CourseUpdateRequest
+    ) -> Course:
+        with database_session() as session:
+            db_course = Course(**course_update_request.model_dump(exclude_none=True))
+            db_course = repository.update_course(
+                db_session=session, course_id=course_id, course_update=db_course
             )
 
         return db_course

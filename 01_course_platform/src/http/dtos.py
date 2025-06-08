@@ -36,6 +36,11 @@ class CourseCreate(BaseModel):
     instructor_id: Annotated[int, "The user.id of the instructor of this course"]
 
 
+class CourseUpdateRequest(BaseModel):
+    name: str | None = None
+    description: str | None = None
+
+
 class UserWithCoursesInstructed(UserBase):
     id: int | None = None
     courses_instructed: list[Course] = []
